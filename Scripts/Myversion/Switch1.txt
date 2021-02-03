@@ -1,0 +1,35 @@
+enable
+!
+conf t
+!
+hostname S1
+!
+enable secret 5 cisco
+!
+aaa new-model
+!
+no ip domain lookup
+ip domain name school.test
+!
+username tycho privilege 15 password 0 cisco
+username root privilege 15 password 0 cisco
+!
+int e0/1
+duplex full
+!
+interface vlan 1
+ip address 192.168.11.4 255.255.255.0
+no sh
+!
+line con 0
+exec-timeout 0 0
+privilege level 15
+logging synchronous
+line vty 0 4
+password cisco
+transport input all
+!
+Crypto key generate rsa
+2048
+Ip ssh version 2
+!

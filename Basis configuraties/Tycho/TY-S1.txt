@@ -1,0 +1,27 @@
+enable
+conf t
+hostname TY-S1
+AAA new-model
+ip domain-name school.test
+enable secret cisco
+line con 0
+logging synchronous
+password cisco
+login authentication default
+line vty 0 4
+logging synchronous
+password cisco
+login
+transport input ssh
+exit authentication default
+interface vlan 1
+ip address 192.168.11.1 255.255.255.0
+description naar Ansible container
+no shutdown
+exit
+username root privilege 15 password 0 cisco
+crypto key generate rsa general-keys modulus 1024
+ip ssh version 2
+banner motd #
+Unauthorized access is prohibited #
+end

@@ -1,0 +1,122 @@
+---
+- name: basisconfiguratie
+  hosts: AN-02
+  gather_facts: false
+  connection: local
+
+  vars:
+    cli:
+      username: root
+      password: cisco
+
+  tasks:
+    - name: global config settings
+      ios_config:
+        provider: "{{ cli }}"
+        lines:
+          - enable secret cisco
+          - ipv6 unicast-routing
+          - ip cef
+
+    - name: line console password
+      ios_config:
+        provider: "{{ cli }}"
+        authorize: yes
+        parents: line console 0
+        lines:
+          - login authentication default
+          - password cisco
+
+      register: print_output
+
+    - name: line vty password
+      ios_config:
+        provider: "{{ cli }}"
+        authorize: yes
+        parents: line vty 0 4
+        lines:
+          - login authentication default
+          - password cisco
+
+      register: print_output
+
+    - name: line vty password
+      ios_config:
+        provider: "{{ cli }}"
+        authorize: yes
+        parents: line vty 5 15
+        lines:
+          - login authentication default
+          - password cisco
+
+      register: print_output
+
+    - name: banner motd
+      ios_config:
+        provider: "{{ cli }}"
+        lines:
+          - banner motd $ Niet toegankelijk $
+
+      register: print_output
+
+    - name: configure FastEthernet0/0 settings
+      ios_config:
+        lines:
+          - description to AN-01
+          - ip address 192.168.34.2 255.255.255.0
+          - ipv6 address fdb0::2/13 eui-64
+          - mpls ip
+          - no shut
+        parents: interface FastEthernet0/0
+
+        host: "{{ ansible_host }}"
+        username: root
+        password: cisco
+
+    - name: configure GigabitEthernet1/0 settings
+      ios_config:
+        lines:
+          - description to AN-04
+          - ip address 192.168.32.2 255.255.255.0
+          - ipv6 address fd98::2/13 eui-64
+          - mpls ip
+          - no shut
+        parents: interface GigabitEthernet1/0
+
+        host: "{{ ansible_host }}"
+        username: root
+        password: cisco
+
+    - name: configure GigabitEthernet2/0 settings
+      ios_config:
+        lines:
+          - description to AN-03
+          - ip address 192.168.35.2 255.255.255.0
+          - ipv6 address fda8::1/13 eui-64
+          - mpls ip
+          - no shut
+        parents: interface GigabitEthernet2/0
+
+        host: "{{ ansible_host }}"
+        username: root
+        password: cisco
+
+
+    - name: enable ospf
+      ios_config:
+        provider: "{{ cli }}"
+        authorize: yes
+        parents: router ospf 1
+        lines:
+          - network 192.168.32.0 255.255.255.0 area 0
+          - network 192.168.34.0 255.255.255.0 area 0
+          - network 192.168.35.0 255.255.255.0 area 0
+
+    - name: save config
+      ios_command:
+        commands:
+          - write memory
+
+        host: "{{ ansible_host }}"
+        username: root
+        password: cisco

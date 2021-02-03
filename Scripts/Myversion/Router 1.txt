@@ -1,0 +1,37 @@
+enable
+conf t
+!
+hostname R1
+!
+enable secret 5 cisco
+!
+aaa new-model
+!
+no ip domain lookup
+ip domain name school.test
+no ipv6 cef
+!
+username tycho privilege 15 password 0 cisco
+username root privilege 15 password 0 cisco
+!
+interface FastEthernet0/0
+ip address 192.168.63.100 255.255.255.0
+no sh
+!
+line con 0
+exec-timeout 0 0
+privilege level 15
+!
+logging synchronous
+line vty 0 4
+password cisco
+transport input ssh
+!
+line vty 5 15
+password cisco
+transport input ssh
+!
+Crypto key generate rsa
+2048
+Ip ssh version 2
+!
